@@ -7,7 +7,7 @@ Utils for work with api
 pip install pyllector 
 ```
 
-## Examples
+## Example
 
 ```Python
 from pyllector import ApiCollector
