@@ -13,9 +13,9 @@ class ApiCollector:
     def pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
     
-    async def push_request(self, method: str, content_type: ContentType,
-                           http_method: HttpMethod = HttpMethod.GET,
-                           params: dict = None, **kwargs) -> dict | str:
+    async def push(self, method: str, content_type: ContentType,
+                   http_method: HttpMethod = HttpMethod.GET,
+                   params: dict = None, **kwargs) -> dict | str:
         
         params = self.pull_params_together(params)
         
