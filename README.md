@@ -15,7 +15,7 @@ from models import HttpMethod, ContentType
 
 api = ApiCollector('https://some-api.com/v2/', main_params={'some_api_key': 'some...'})
 
-data = api.push('some_api_method', content_type=ContentType.JSON, http_method=HttpMethod.POST)
+data = api.push('some_api_method', content_type=ContentType.JSON, http_method=HttpMethod.POST, params={'some_method_param': 'some_value'})
 
 print(data['some keys'])
 
