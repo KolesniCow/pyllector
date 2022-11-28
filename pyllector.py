@@ -5,13 +5,13 @@ from models import HttpMethod, ContentType
 
 class ApiCollector:
     def __init__(self, main_api_link: str, main_params: dict = None):
-        self.main_api_link = self.right_main_link(main_api_link)
+        self.main_api_link = self._right_main_link(main_api_link)
         self.main_api_params = main_params
     
-    def pull_params_together(self, params: dict = None) -> dict:
+    def _pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
     
-    def right_main_link(self, main_link):
+    def _right_main_link(self, main_link):
         return main_link if main_link[-1] == '/' else f'{main_link}/'
     
     async def push(self, method: str = '', content_type: ContentType = ContentType.TEXT,
@@ -23,12 +23,12 @@ class ApiCollector:
             print('Failed get this url. Tries is over')
             return None
         
-        params = self.pull_params_together(params)
+        params = self._pull_params_together(params)
         
         async with aiohttp.ClientSession() as session:
             async with session.request(http_method.value, f'{self.main_api_link}{method}', params=params, **kwargs) as response:
                 if response.status != 400:
-                    if self.is_valid_response(response):
+                    if self._is_valid_response(response):
                         if content_type == ContentType.TEXT:
                             return await response.text()
                         if content_type == ContentType.JSON:
@@ -44,7 +44,7 @@ class ApiCollector:
                     print('Bad Request', response.url)
                     return None
             
-    def is_valid_response(self, request) -> bool:
+    def _is_valid_response(self, request) -> bool:
         return True if request.status == 200 else False
         
 
