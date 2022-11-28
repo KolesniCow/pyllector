@@ -13,7 +13,7 @@ pip install pyllector
 from pyllector import ApiCollector
 from models import HttpMethod, ContentType
 
-api = ApiCollector('https://some-api.com/v2/', params={'some_api_key': 'some...'})
+api = ApiCollector('https://some-api.com/v2/', main_params={'some_api_key': 'some...'})
 
 data = api.push('some_api_method', content_type=ContentType.JSON, http_method=HttpMethod.POST)
 
