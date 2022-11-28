@@ -5,7 +5,7 @@ import asyncio
 
 async def main():
     collector = ApiCollector('https://vk.com')
-    print(await collector.push())
+    print(await collector.push(cookies={}))
 
 
 if __name__ == '__main__':
