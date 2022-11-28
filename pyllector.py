@@ -4,10 +4,9 @@ from models import HttpMethod, ContentType
 
 
 class ApiCollector:
-    def __init__(self, main_api_link: str, main_params: str = None, cookie: dict = None):
+    def __init__(self, main_api_link: str, main_params: str = None):
         self.main_api_link = main_api_link
         self.main_api_params = main_params
-        self.cookie = cookie
         self.session = aiohttp.ClientSession()
     
     def pull_params_together(self, params: dict = None) -> dict:
@@ -31,7 +30,7 @@ class ApiCollector:
         req = await self.push_request(method, http_method, params)
         if limit != 0 and str(req.status_code) != str(http_code):
             await asyncio.sleep(time)
-            return await self.get_until_http_code(method, http_method, limit-1, time, params, http_code)
+            return await self.get_until_http_code(method, http_method, limit-1, params=params)
         elif str(req.status_code) == str(http_code):
             return req
         elif limit == 0:
