@@ -5,13 +5,16 @@ from models import HttpMethod, ContentType
 
 class ApiCollector:
     def __init__(self, main_api_link: str, main_params: dict = None):
-        self.main_api_link = main_api_link
+        self.main_api_link = self.right_main_link(main_api_link)
         self.main_api_params = main_params
     
     def pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
     
-    async def push(self, method: str = '/', content_type: ContentType = ContentType.TEXT,
+    def right_main_link(self, main_link):
+        return main_link if main_link[-1] == '/' else f'{main_link}/'
+    
+    async def push(self, method: str = '', content_type: ContentType = ContentType.TEXT,
                    http_method: HttpMethod = HttpMethod.GET,
                    params: dict = None, limit: int = 5,
                    time: float = 60, **kwargs) -> dict | str | None:
