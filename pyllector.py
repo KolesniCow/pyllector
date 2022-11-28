@@ -4,7 +4,7 @@ from models import HttpMethod, ContentType
 
 
 class ApiCollector:
-    def __init__(self, main_api_link: str, main_params: str = None):
+    def __init__(self, main_api_link: str, main_params: dict = None):
         self.main_api_link = main_api_link
         self.main_api_params = main_params
         self.session = aiohttp.ClientSession()
