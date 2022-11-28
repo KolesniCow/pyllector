@@ -12,28 +12,37 @@ class ApiCollector:
     def pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
     
-    async def push(self, method: str, content_type: ContentType,
+    async def push(self, method: str = '/', content_type: ContentType = ContentType.TEXT,
                    http_method: HttpMethod = HttpMethod.GET,
-                   params: dict = None, **kwargs) -> dict | str:
+                   params: dict = None, limit: int = 5,
+                   time: float = 60, **kwargs) -> dict | str | None:
+        
+        if limit == 0:
+            print('Failed get this url. Tries is over')
+            return None
         
         params = self.pull_params_together(params)
         
-        async with self.session.request(http_method.value, f'{self.main_api_link}/{method}', params=params, **kwargs) as response:    
-            if content_type == ContentType.TEXT:
-                return await response.text
-            if content_type == ContentType.JSON:
-                return await response.json
+        async with self.session.request(http_method.value, f'{self.main_api_link}{method}', params=params, **kwargs) as response:
+            if response.status != 400:
+                if self.is_valid_response(response):
+                    if content_type == ContentType.TEXT:
+                        return await response.text()
+                    if content_type == ContentType.JSON:
+                        return await response.json()
+                else:
+                    if response.status != 429:
+                        print(f'Failed get it url. Status code {response.status}. URL {response.url}')
+                    else:
+                        print(f'429 Http code. Repeat request again across {time} seconds.')
+                        await asyncio.sleep(time)
+                    await self.push(method, content_type, limit=limit-1 **kwargs)
+            else:
+                print('Bad Request', response.url)
+                return None
+            
+    def is_valid_response(self, request) -> bool:
+        return True if request.status == 200 else False
+        
 
-    async def get_until_http_code(self, method: str, http_method: HttpMethod,
-                            limit: int = 5, time: float = 10,
-                            params: dict = None, http_code: int = 200) -> str | None | dict:
-        req = await self.push_request(method, http_method, params)
-        if limit != 0 and str(req.status_code) != str(http_code):
-            await asyncio.sleep(time)
-            return await self.get_until_http_code(method, http_method, limit-1, params=params)
-        elif str(req.status_code) == str(http_code):
-            return req
-        elif limit == 0:
-            return None
-    
     
