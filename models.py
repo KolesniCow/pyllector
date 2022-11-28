@@ -6,3 +6,8 @@ class HttpMethod(Enum):
     POST = 'POST'
     PUT = 'PUT'
     DELETE = 'DELETE'
+    
+    
+class ContentType(Enum):
+    TEXT = 1
+    JSON = 2
