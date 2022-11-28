@@ -28,11 +28,13 @@ class ApiCollector:
     async def get_until_http_code(self, method: str, http_method: HttpMethod,
                             limit: int = 5, time: float = 10,
                             params: dict = None, http_code: int = 200) -> str | None | dict:
-        req = self.push_request(method, http_method, params)
+        req = await self.push_request(method, http_method, params)
         if limit != 0 and str(req.status_code) != str(http_code):
-            asyncio.sleep(time)
-            return self.get_until_http_code(method, http_method, limit-1, time, params, http_code)
+            await asyncio.sleep(time)
+            return await self.get_until_http_code(method, http_method, limit-1, time, params, http_code)
         elif str(req.status_code) == str(http_code):
             return req
         elif limit == 0:
             return None
+    
+    
