@@ -1,2 +1,2 @@
-from pyllector import *
-from models import *
+from pyllector.pyllector import ApiCollector
+from pyllector.models import HttpMethod, ContentType
