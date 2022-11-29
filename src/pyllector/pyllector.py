@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-from src.pyllector.models import HttpMethod, ContentType
+from pyllector.models import HttpMethod, ContentType
 
 
 class ApiCollector:
