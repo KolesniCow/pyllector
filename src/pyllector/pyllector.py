@@ -2,9 +2,9 @@ import asyncio
 import aiohttp
 from pyllector.models import HttpMethod, ContentType
 
-
-class ApiCollector:
-    def __init__(self, main_api_link: str, main_params: dict = None):
+class ApiCollector(aiohttp.ClientSession):
+    def __init__(self, main_api_link: str, main_params: dict = None, main_cookie: dict = None, **kwargs):
+        super().__init__(cookies=main_cookie, **kwargs)
         self.main_api_link = self._right_main_link(main_api_link)
         self.main_api_params = main_params
     
@@ -25,24 +25,23 @@ class ApiCollector:
         
         params = self._pull_params_together(params)
         
-        async with aiohttp.ClientSession() as session:
-            async with session.request(http_method.value, f'{self.main_api_link}{method}', params=params, **kwargs) as response:
-                if response.status != 400:
-                    if self._is_valid_response(response):
-                        if content_type == ContentType.TEXT:
-                            return await response.text()
-                        if content_type == ContentType.JSON:
-                            return await response.json()
-                    else:
-                        if response.status != 429:
-                            print(f'Failed get it url. Status code {response.status}. URL {response.url}')
-                        else:
-                            print(f'429 Http code. Repeat request again across {time} seconds.')
-                            await asyncio.sleep(time)
-                        return await self.push(method, content_type, limit=limit-1 **kwargs)
+        async with self.request(http_method.value, f'{self.main_api_link}{method}', params=params, **kwargs) as response:
+            if response.status != 400:
+                if self._is_valid_response(response):
+                    if content_type == ContentType.TEXT:
+                        return await response.text()
+                    if content_type == ContentType.JSON:
+                        return await response.json()
                 else:
-                    print('Bad Request', response.url)
-                    return None
+                    if response.status != 429:
+                        print(f'Failed get it url. Status code {response.status}. URL {response.url}')
+                    else:
+                        print(f'429 Http code. Repeat request again across {time} seconds.')
+                        await asyncio.sleep(time)
+                    return await self.push(method, content_type, limit=limit-1 **kwargs)
+            else:
+                print('Bad Request', response.url)
+                return None
             
     def _is_valid_response(self, request) -> bool:
         return True if request.status == 200 else False

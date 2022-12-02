@@ -1,5 +1,5 @@
 ## pyllector
-Utils for work with api
+Modifided aiohttp.ClientSession. More Safety.
 
 ## Instalation
 
@@ -32,4 +32,4 @@ asyncio.run(main())
 
 ApiCollector check allmost http errors,
  and repeat request `limit` times until he gets response,
-  or will return None else `limit` is 0.
+ or will return None else `limit` is 0.
