@@ -38,7 +38,7 @@ class ApiCollector(aiohttp.ClientSession):
                     else:
                         print(f'429 Http code. Repeat request again across {time} seconds.')
                         await asyncio.sleep(time)
-                    return await self.push(method, content_type, limit=limit-1 **kwargs)
+                    return await self.push(method, content_type, limit=limit-1, **kwargs)
             else:
                 print('Bad Request', response.url)
                 return None
