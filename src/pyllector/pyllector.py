@@ -1,6 +1,9 @@
 import asyncio
-import aiohttp
+
 from pyllector.models import HttpMethod, ContentType
+
+import aiohttp
+
 
 class ApiCollector(aiohttp.ClientSession):
     def __init__(self, main_api_link: str, main_params: dict = None, main_cookie: dict = None, **kwargs):
@@ -10,6 +13,13 @@ class ApiCollector(aiohttp.ClientSession):
     
     def _pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
+    
+    async def _return_content_by_content_type(self, content_type: ContentType, response: aiohttp.ClientResponse) -> str | dict:
+        if content_type == ContentType.TEXT:
+            return await response.text()
+                    
+        if content_type == ContentType.JSON:
+            return await response.json()
     
     def _right_main_link(self, main_link):
         return main_link if main_link[-1] == '/' else f'{main_link}/'
@@ -24,21 +34,21 @@ class ApiCollector(aiohttp.ClientSession):
             return None
         
         params = self._pull_params_together(params)
-        
         async with self.request(http_method.value, f'{self.main_api_link}{method}', params=params, **kwargs) as response:
+            
             if response.status != 400:
+                
                 if self._is_valid_response(response):
-                    if content_type == ContentType.TEXT:
-                        return await response.text()
-                    if content_type == ContentType.JSON:
-                        return await response.json()
+                    
+                    return await self._return_content_by_content_type(content_type, response)
+                    
                 else:
                     if response.status != 429:
                         print(f'Failed get it url. Status code {response.status}. URL {response.url}')
                     else:
                         print(f'429 Http code. Repeat request again across {time} seconds.')
                         await asyncio.sleep(time)
-                    return await self.push(method, content_type, limit=limit-1, **kwargs)
+                    return await self.push(method, content_type, limit=limit-1, time=time, **kwargs)
             else:
                 print('Bad Request', response.url)
                 return None
