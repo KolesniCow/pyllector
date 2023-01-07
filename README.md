@@ -4,7 +4,7 @@ Modifided aiohttp.ClientSession. More Safety.
 ## Instalation
 
 ```Bash
-poetry add https://github.com/KolesniCow/pyllector.git
+poetry add git+https://github.com/KolesniCow/pyllector.git#main
 
 # pip install pyllector (For 0.0.6 version)
 ```
