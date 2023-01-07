@@ -4,20 +4,22 @@ Modifided aiohttp.ClientSession. More Safety.
 ## Instalation
 
 ```Bash
-pip install pyllector 
+poetry add https://github.com/KolesniCow/pyllector.git
+
+# pip install pyllector (For 0.0.6 version)
 ```
 
 ## Example
 
 ```Python
-from pyllector import ApiCollector
+from pyllector import ApiClientAsync
 from models import HttpMethod, ContentType
 
 import asyncio
 
 
 async def main():
-    api = ApiCollector('https://some-api.com/v2/', main_params={'some_api_key': 'some...'})
+    api = ApiClientAsync('https://some-api.com/v2/', main_params={'some_api_key': 'some...'})
     data = await api.push('some_api_method',
                         content_type=ContentType.JSON,
                         http_method=HttpMethod.POST,
