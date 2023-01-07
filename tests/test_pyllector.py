@@ -1,12 +1,12 @@
-from pyllector import ApiCollector
+from pyllector.sync.client import ApiCollector
 
 import asyncio
 
 
-async def main():
+def main():
     collector = ApiCollector('https://vk.com')
-    print(await collector.push())
+    print(collector.push())
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()
