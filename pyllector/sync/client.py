@@ -1,11 +1,9 @@
-import asyncio
+import requests
 
 from pyllector.models import HttpMethod, ContentType
 
-import aiohttp
 
-
-class ApiCollector(aiohttp.ClientSession):
+class ApiClient(requests.Session):
     def __init__(self, main_api_link: str, main_params: dict = None, main_cookie: dict = None, **kwargs):
         super().__init__(cookies=main_cookie, **kwargs)
         self.main_api_link = self._right_main_link(main_api_link)
@@ -55,6 +53,3 @@ class ApiCollector(aiohttp.ClientSession):
             
     def _is_valid_response(self, request) -> bool:
         return True if request.status == 200 else False
-        
-
-    
