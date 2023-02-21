@@ -8,12 +8,15 @@ from pyllector.models import HttpMethod, ContentType
 class ApiClient(Session):
     def __init__(
         self, main_api_link: str, main_params: dict = None,
-        main_cookie: dict = None, **kwargs
+        main_cookie: dict = None, proxy: dict = None,
+        astro_proxy_change_link: str = None,  **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.main_api_link = self._right_main_link(main_api_link)
-        self.main_api_params = main_params
+        self.main_api_params = main_params if main_params else {}
         self.main_cookies = main_cookie if main_cookie else {}
+        self.astro_link = astro_proxy_change_link
+        self.proxies.update(proxy)
 
     def _pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
@@ -61,8 +64,13 @@ class ApiClient(Session):
                         f'URL {response.url}'
                     )
                 else:
-                    print(f'429 Http code. Repeat request again across {time} seconds.')
-                    sleep(time)
+                    if not self.astro_link:
+                        print(f'429 Http code. Repeat request again across {time} seconds.')
+                        sleep(time)
+                    else:
+                        print('429 Http code. Repeat request with new proxy.')
+                        new_proxy = self.get(self.astro_link).json()['IP']
+                        print(f'Proxy is change, current ip is {new_proxy}')
                 return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
         else:
             print('Bad Request', response.url)

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyllector"
-version = "0.0.7.4"
+version = "0.1.8"
 description = "Simple api collector"
 authors = ["KolesniCow <alexandr.kolesnikovv2@gmail.com>"]
 license = "MIT"
