@@ -11,3 +11,4 @@ class HttpMethod(Enum):
 class ContentType(Enum):
     TEXT = 1
     JSON = 2
+    RESPONSE = 3

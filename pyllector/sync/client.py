@@ -1,5 +1,6 @@
 from time import sleep
 
+import requests
 from requests import Session, Response
 
 from pyllector.models import HttpMethod, ContentType
@@ -25,12 +26,14 @@ class ApiClient(Session):
     @staticmethod
     def _return_content_by_content_type(
         content_type: ContentType, response: Response
-    ) -> str | dict | None:
+    ) -> str | dict | requests.Response:
         if content_type == ContentType.TEXT:
             return response.text
 
         if content_type == ContentType.JSON:
             return response.json()
+
+        return response
 
     def _right_main_link(self, main_link):
         return main_link if main_link[-1] == '/' else f'{main_link}/'
