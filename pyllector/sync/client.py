@@ -16,7 +16,8 @@ class ApiClient(Session):
         self.main_api_params = main_params if main_params else {}
         self.main_cookies = main_cookie if main_cookie else {}
         self.astro_link = astro_proxy_change_link
-        self.proxies.update(proxy)
+        self.proxy = proxy
+        self.proxies.update(self.proxy)
 
     def _pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
@@ -71,7 +72,8 @@ class ApiClient(Session):
                         print('429 Http code. Repeat request with new proxy.')
                         new_proxy = self.get(self.astro_link).json()['IP']
                         print(f'Proxy is change, current ip is {new_proxy}')
-                        sleep(10)
+                        self.proxies.update(self.proxy)
+                        sleep(5)
                 return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
         else:
             print('Bad Request', response.url)
