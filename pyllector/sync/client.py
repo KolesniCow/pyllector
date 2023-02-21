@@ -71,6 +71,7 @@ class ApiClient(Session):
                         print('429 Http code. Repeat request with new proxy.')
                         new_proxy = self.get(self.astro_link).json()['IP']
                         print(f'Proxy is change, current ip is {new_proxy}')
+                        sleep(10)
                 return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
         else:
             print('Bad Request', response.url)
