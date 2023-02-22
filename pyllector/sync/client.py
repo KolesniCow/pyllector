@@ -76,7 +76,7 @@ class ApiClient(Session):
                         new_proxy = self.get(self.astro_link).json()['IP']
                         print(f'Proxy is change, current ip is {new_proxy}')
                         self.proxies.update(self.proxy)
-                        sleep(5)
+                        self.get('https://google.com')
                 return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
         else:
             print('Bad Request', response.url)
