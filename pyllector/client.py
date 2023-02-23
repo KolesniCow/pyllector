@@ -34,13 +34,31 @@ class ApiClient(Session):
             return response.json()
 
         return response
+    
+    @staticmethod
+    def _is_valid_content(response: requests.Response) -> bool:
+        return False if not response.text and not response.text == 'None' else True
 
     def _right_main_link(self, main_link):
         return main_link if main_link[-1] == '/' else f'{main_link}/'
+    
+    @staticmethod
+    def _is_many_request_error(response: requests.Response) -> bool:
+        if response.status_code == 429:
+            if not self.astro_link:
+                print(f'429 Http code. Repeat request again across {time} seconds.')
+                sleep(time)
+            else:
+                print('429 Http code. Repeat request with new proxy.')
+                new_proxy = self.get(self.astro_link).json()['IP']
+                print(f'Proxy is change, current ip is {new_proxy}')
+                self.proxies.update(self.proxy)
+            return True
+        return False
 
     def push(
         self, method: str = '',
-        content_type: ContentType = ContentType.TEXT,
+        content_type: ContentType = None,
         http_method: HttpMethod = HttpMethod.GET,
         params: dict = None, limit: int = 5, time: float = 60, **kwargs
     ) -> dict | str | None:
@@ -56,31 +74,27 @@ class ApiClient(Session):
             params=params,
             cookies=self.main_cookies, **kwargs
         )
-        if response.status_code != 400:
-            if self._is_valid_response(response):
-                return self._return_content_by_content_type(
-                    content_type, response
-                )
-            else:
-                if response.status_code != 429:
-                    print(
-                        f'Failed get it url. Status code {response.status_code}.'
-                        f'URL {response.url}'
-                    )
-                else:
-                    if not self.astro_link:
-                        print(f'429 Http code. Repeat request again across {time} seconds.')
-                        sleep(time)
-                    else:
-                        print('429 Http code. Repeat request with new proxy.')
-                        new_proxy = self.get(self.astro_link).json()['IP']
-                        print(f'Proxy is change, current ip is {new_proxy}')
-                        self.proxies.update(self.proxy)
-                        self.get('https://google.com')
-                return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
-        else:
+
+        if self._is_valid_content(response):
+            print('Response is empty or return None. Try Request again')
+
+        if response.status_code == 400:
             print('Bad Request', response.url)
             return None
+        
+        if response.status_code != 429:
+            print(
+                f'Failed get it url. Status code {response.status_code}.'
+                f'URL {response.url}'
+            )
+            return None
+
+        if _is_many_request_error():
+            return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
+
+        if self._is_valid_response(response):
+            return self._return_content_by_content_type(content_type, response)
+
 
     def _is_valid_response(self, request: Response) -> bool:
         return True if request.status_code == 200 else False
