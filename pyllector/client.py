@@ -18,7 +18,7 @@ class ApiClient(Session):
         self.main_cookies = main_cookie if main_cookie else {}
         self.astro_link = astro_proxy_change_link
         self.proxy = proxy
-        self.proxies.update(self.proxy)
+        self.proxies.update(self.proxy) if proxy is not None else None
 
     def _pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
