@@ -75,8 +75,12 @@ class ApiClient(Session):
             cookies=self.main_cookies, **kwargs
         )
 
-        if self._is_valid_content(response):
+        if not self._is_valid_content(response):
             print('Response is empty or return None. Try Request again')
+            return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
+
+        if self._is_valid_response(response):
+            return self._return_content_by_content_type(content_type, response)
 
         if response.status_code == 400:
             print('Bad Request', response.url)
@@ -91,9 +95,6 @@ class ApiClient(Session):
 
         if _is_many_request_error():
             return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
-
-        if self._is_valid_response(response):
-            return self._return_content_by_content_type(content_type, response)
 
 
     def _is_valid_response(self, request: Response) -> bool:
