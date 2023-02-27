@@ -93,7 +93,7 @@ class ApiClient(Session):
             )
             return None
 
-        if _is_many_request_error():
+        if self._is_many_request_error():
             return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
 
 
