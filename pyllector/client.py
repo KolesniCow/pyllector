@@ -41,9 +41,8 @@ class ApiClient(Session):
 
     def _right_main_link(self, main_link):
         return main_link if main_link[-1] == '/' else f'{main_link}/'
-    
-    @staticmethod
-    def _is_many_request_error(response: requests.Response) -> bool:
+
+    def _is_many_request_error(self, response: requests.Response) -> bool:
         if response.status_code == 429:
             if not self.astro_link:
                 print(f'429 Http code. Repeat request again across {time} seconds.')
