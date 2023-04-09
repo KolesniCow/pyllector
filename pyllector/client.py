@@ -34,7 +34,7 @@ class ApiClient(Session):
             return response.json()
 
         return response
-    
+
     @staticmethod
     def _is_valid_content(response: requests.Response) -> bool:
         return False if not response.text and not response.text == 'None' else True
@@ -45,7 +45,8 @@ class ApiClient(Session):
     def _is_many_request_error(self, response: requests.Response) -> bool:
         if response.status_code == 429:
             if not self.astro_link:
-                print(f'429 Http code. Repeat request again across {time} seconds.')
+                print(
+                    f'429 Http code. Repeat request again across {time} seconds.')
                 sleep(time)
             else:
                 print('429 Http code. Repeat request with new proxy.')
@@ -67,12 +68,22 @@ class ApiClient(Session):
             return None
 
         params = self._pull_params_together(params)
-        response = self.request(
-            http_method.value,
-            f'{self.main_api_link}{method}',
-            params=params,
-            cookies=self.main_cookies, **kwargs
-        )
+        api_link = f'{self.main_api_link}{method}'
+
+        if http_method is HttpMethod.GET:
+            response = self.request(
+                http_method.value,
+                api_link,
+                params=params,
+                cookies=self.main_cookies, **kwargs
+            )
+        else:
+            response = self.request(
+                http_method.value,
+                api_link,
+                json=params,
+                cookies=self.main_cookies, **kwargs
+            )
 
         if not self._is_valid_content(response):
             print('Response is empty or return None. Try Request again')
@@ -84,7 +95,7 @@ class ApiClient(Session):
         if response.status_code == 400:
             print('Bad Request', response.url)
             return None
-        
+
         if response.status_code != 429:
             print(
                 f'Failed get it url. Status code {response.status_code}.'
@@ -94,7 +105,6 @@ class ApiClient(Session):
 
         if self._is_many_request_error(response):
             return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
-
 
     def _is_valid_response(self, request: Response) -> bool:
         return True if request.status_code == 200 else False
