@@ -70,20 +70,12 @@ class ApiClient(Session):
         params = self._pull_params_together(params)
         api_link = f'{self.main_api_link}{method}'
 
-        if http_method is HttpMethod.GET:
-            response = self.request(
-                http_method.value,
-                api_link,
-                params=params,
-                cookies=self.main_cookies, **kwargs
-            )
-        else:
-            response = self.request(
-                http_method.value,
-                api_link,
-                json=params,
-                cookies=self.main_cookies, **kwargs
-            )
+        response = self.request(
+            http_method.value,
+            api_link,
+            params=params,
+            cookies=self.main_cookies, **kwargs
+        )
 
         if not self._is_valid_content(response):
             print('Response is empty or return None. Try Request again')
