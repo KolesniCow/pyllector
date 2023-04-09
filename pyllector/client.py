@@ -43,10 +43,10 @@ class ApiClient(Session):
         return main_link if main_link[-1] == '/' else f'{main_link}/'
 
     def _is_many_request_error(self, response: requests.Response) -> bool:
-        if response.status_code == 429:
+        if response.status_code == 429 or response.status_code == 502:
             if not self.astro_link:
                 print(
-                    f'429 Http code. Repeat request again across {time} seconds.')
+                    f'Too many requests. Repeat request again across {time} seconds.')
                 sleep(time)
             else:
                 print('429 Http code. Repeat request with new proxy.')
