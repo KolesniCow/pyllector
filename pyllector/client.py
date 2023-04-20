@@ -76,6 +76,9 @@ class ApiClient(Session):
             params=params,
             cookies=self.main_cookies, **kwargs
         )
+        
+        if self._is_many_request_error(response):
+            return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
 
         if not self._is_valid_content(response):
             print('Response is empty or return None. Try Request again')
@@ -95,8 +98,6 @@ class ApiClient(Session):
             )
             return None
 
-        if self._is_many_request_error(response):
-            return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
 
     def _is_valid_response(self, request: Response) -> bool:
         return True if request.status_code == 200 else False
