@@ -10,7 +10,7 @@ class ApiClient(Session):
     def __init__(
         self, main_api_link: str, main_params: dict = None,
         main_cookie: dict = None, proxy: dict = None,
-        astro_proxy_change_link: str = None,  **kwargs
+        astro_proxy_change_link: str = None, default_time_limit: int = 60, **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.main_api_link = self._right_main_link(main_api_link)
@@ -19,6 +19,7 @@ class ApiClient(Session):
         self.astro_link = astro_proxy_change_link
         self.proxy = proxy
         self.proxies.update(self.proxy) if proxy is not None else None
+        self.default_time_limit = default_time_limit
 
     def _pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
@@ -47,7 +48,7 @@ class ApiClient(Session):
             if not self.astro_link:
                 print(
                     f'Too many requests. Repeat request again across {time} seconds.')
-                sleep(time)
+                sleep(self.default_time_limit)
             else:
                 print('429 Http code. Repeat request with new proxy.')
                 new_proxy = self.get(self.astro_link).json()['IP']
@@ -60,7 +61,7 @@ class ApiClient(Session):
         self, method: str = '',
         content_type: ContentType = None,
         http_method: HttpMethod = HttpMethod.GET,
-        params: dict = None, limit: int = 5, time: float = 60, **kwargs
+        params: dict = None, limit: int = 5, **kwargs
     ) -> dict | str | None:
 
         if limit == 0:
@@ -78,11 +79,11 @@ class ApiClient(Session):
         )
         
         if self._is_many_request_error(response):
-            return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
+            return self.push(method, content_type, limit=limit-1, **kwargs)
 
         if not self._is_valid_content(response):
             print('Response is empty or return None. Try Request again')
-            return self.push(method, content_type, limit=limit-1, time=time, **kwargs)
+            return self.push(method, content_type, limit=limit-1, **kwargs)
 
         if self._is_valid_response(response):
             return self._return_content_by_content_type(content_type, response)
