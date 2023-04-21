@@ -47,7 +47,7 @@ class ApiClient(Session):
         if response.status_code == 429 or response.status_code == 502:
             if not self.astro_link:
                 print(
-                    f'Too many requests. Repeat request again across {time} seconds.')
+                    f'Too many requests. Repeat request again across {self.default_time_limit} seconds.')
                 sleep(self.default_time_limit)
             else:
                 print('429 Http code. Repeat request with new proxy.')
