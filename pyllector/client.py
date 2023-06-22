@@ -75,7 +75,7 @@ class ApiClient(Session):
             http_method.value,
             api_link,
             params=params,
-            cookies=self.main_cookies, **kwargs
+            cookies=self.main_cookies
         )
         
         if self._is_many_request_error(response):
