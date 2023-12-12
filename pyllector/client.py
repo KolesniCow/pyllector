@@ -2,8 +2,8 @@ from time import sleep
 
 import requests
 from requests import Session, Response
-import urllib.parse
 import logging
+from urllib.parse import urljoin
 
 from pyllector.models import HttpMethod, ContentType
 
@@ -11,18 +11,17 @@ from pyllector.models import HttpMethod, ContentType
 class ApiClient(Session):
     def __init__(
         self, main_api_link: str, main_params: dict = None,
-        main_cookie: dict = None, proxy: dict = None, default_time_limit: int = 60,
+        main_cookie: dict = None, proxy: dict = None,
         default_headers: dict = None, **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.logger = logging.getLogger('pyllector')
         self.headers.update(default_headers) if default_headers else None
-        self.main_api_link = main_api_link
+        self.main_api_link = main_api_link if main_api_link.endswith('/') else f'{main_api_link}/'
         self.main_api_params = main_params if main_params else {}
         self.main_cookies = main_cookie if main_cookie else {}
         self.proxy = proxy
         self.proxies.update(self.proxy) if proxy is not None else None
-        self.default_time_limit = default_time_limit
 
     def _pull_params_together(self, params: dict = None) -> dict:
         return {**self.main_api_params,  **params} if params is not None else self.main_api_params
@@ -57,7 +56,7 @@ class ApiClient(Session):
     ) -> dict | str | None:
 
         params = self._pull_params_together(params)
-        api_link = urllib.parse.urljoin(self.main_api_link, method)
+        api_link = urljoin(self.main_api_link, method)
 
         if limit == 0:
             self.logger.error(f'Failed get {api_link}. Tries is over')
