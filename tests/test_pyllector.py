@@ -1,10 +1,12 @@
-from pyllector.sync.client import ApiCollector
+import logging
 
-import asyncio
+from pyllector import ApiClient
+
+logging.basicConfig()
 
 
 def main():
-    collector = ApiCollector('https://vk.com')
+    collector = ApiClient('https://vk.com')
     print(collector.push())
 
 
