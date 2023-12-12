@@ -73,6 +73,7 @@ class ApiClient(Session):
         if self._is_many_request_error(response):
             self.logger.warning(f'Too many requests. Wait {delay_many_requests} sec. '
                                 f'Attempts to get content left: {limit}. URL: {response.url}')
+            sleep(delay_many_requests)
             return self.push(method, content_type, limit=limit-1, **kwargs)
 
         if not self._is_valid_content(response):
